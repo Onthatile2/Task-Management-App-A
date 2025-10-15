@@ -1,12 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Management App</title>
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Task Management App</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-    <script src="./app.js"></script>
+
+  
+     
+
+   
+    <div class="filters">
+      <button onclick="filterTask('completed')">Completed</button>
+      <button onclick="filterTask('pending')">Pending</button>
+      <button onclick="showAllTasks()">All Tasks</button>
+    </div>
+
+    
+    <section>
+      <div id="taskList"></div>
+    </section>
+
+  
+    <section class="footer">
+      <p>Pending Tasks: <span id="pendingCount">0</span></p>
+    </section>
+
+    
+    <div class="logout-container">
+      <button id="logout" onclick="handleLogout()">Logout</button>
+    </div>
+  </div>
+
+ 
+  <script>
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    const taskList = document.getElementById("taskList");
+    const pendingCount = document.getElementById("pendingCount");
+    let tasks = [];
+
+    addTaskBtn.addEventListener("click", () => {
+      const title = document.getElementById("myInput").value.trim();
+      const description = document.getElementById("myText").value.trim();
+
+      if (!title || !description) {
+        alert("Please fill in both fields!");
+        return;
+      }
+
+      tasks.push({ title, description, completed: false });
+      document.getElementById("myInput").value = "";
+      document.getElementById("myText").value = "";
+      displayTasks();
+    });
+
+    function displayTasks(filter = "all") {
+      taskList.innerHTML = "";
+
+      let filteredTasks = tasks;
+      if (filter === "completed") {
+        filteredTasks = tasks.filter(task => task.completed);
+      } else if (filter === "pending") {
+        filteredTasks = tasks.filter(task => !task.completed);
+      }
+
+      if (filteredTasks.length === 0) {
+        taskList.innerHTML = "<p>No tasks to show.</p>";
+        return;
+      }
+
+      filteredTasks.forEach((task, index) => {
+        const div = document.createElement("div");
+        div.className = "task" + (task.completed ? " completed" : "");
+
+        const title = document.createElement("span");
+        title.className = "task-title";
+        title.textContent = `${task.title}: ${task.description}`;
+
+        const completeBtn = document.createElement("button");
+        completeBtn.textContent = task.completed ? "Undo" : "Complete";
+        completeBtn.onclick = () => toggleComplete(index);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = () => deleteTask(index);
+
+        div.appendChild(title);
+        div.appendChild(completeBtn);
+        div.appendChild(deleteBtn);
+
+        taskList.appendChild(div);
+      });
+
+      updatePendingCount();
+    }
+
+    function toggleComplete(index) {
+      tasks[index].completed = !tasks[index].completed;
+      displayTasks();
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      displayTasks();
+    }
+
+    function filterTask(filter) {
+      displayTasks(filter);
+    }
+
+    function showAllTasks() {
+      displayTasks("all");
+    }
+
+    function updatePendingCount() {
+      const pending = tasks.filter(task => !task.completed).length;
+      pendingCount.textContent = pending;
+    }
+
+    function handleLogout() {
+      alert("Logged out successfully!");
+      window.location.href = "login.html";
+    }
+
+    
+    displayTasks();
+  </script>
 </body>
 </html>
